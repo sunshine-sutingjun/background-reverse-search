@@ -24,12 +24,28 @@ MAX_THREADS = 16
 # Configure Logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-def natural_sort_key(s):
-    """Sort function for natural order sorting."""
+def natural_sort_key(s): 
+    """
+    Generate a sorting key for a given string to enable natural order sorting.
+
+    Args:
+        s (str): The string to be sorted.
+
+    Returns:
+        list: A list containing a mix of integers and strings for natural sorting.
+    """
     return [int(text) if text.isdigit() else text.lower() for text in re.split(r'(\d+)', s)]
 
 def download_image(url, folder_path, image_number):
-    """Download an image from a URL and save it to a specified folder."""
+    """
+    Download an image from a URL and save it to a specified folder without overwriting existing files.
+
+    Args:
+        url (str): URL of the image to download.
+        folder_path (str): Path of the folder to save the downloaded image.
+        image_number (int): Image number used for naming the saved file.
+    """
+
     image_file_path = os.path.join(folder_path, f"{image_number}.jpg")
     if os.path.exists(image_file_path) or url in IMAGE_CACHE:
         return
@@ -44,7 +60,14 @@ def download_image(url, folder_path, image_number):
         logging.error(f"Failed to download {url}. Error: {e}")
 
 def download_images_concurrently(image_urls, output_folder):
-    """Download images using concurrent threads."""
+    """
+    Download multiple images concurrently from a list of URLs and save them to a specified folder.
+
+    Args:
+        image_urls (list[str]): List of image URLs to download.
+        output_folder (str): Path of the folder to save the downloaded images.
+    """
+
     os.makedirs(output_folder, exist_ok=True)
     with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
         futures = [executor.submit(download_image, url, output_folder, i+1)
@@ -53,7 +76,14 @@ def download_images_concurrently(image_urls, output_folder):
             future.result()  # Handle exceptions inside download_image
 
 def scroll_to_load_images(driver):
-    """Scroll through the webpage to load all images."""
+    """
+    Scroll through a webpage to dynamically load all images.
+
+    Args:
+        driver (webdriver): Selenium WebDriver used for automated webpage navigation.
+    """
+    # Function body...
+
     last_height = driver.execute_script("return document.body.scrollHeight")
     while True:
         driver.execute_script("window.scrollBy(0, document.body.scrollHeight / 2);")
@@ -64,7 +94,15 @@ def scroll_to_load_images(driver):
         last_height = new_height
 
 def search_and_download_similar_images(image_path, driver, output_folder):
-    """Search for similar images and download them."""
+    """
+    Search for similar images using a specified image path and download them using a Selenium WebDriver.
+
+    Args:
+        image_path (str): Path to the image used for searching similar images.
+        driver (webdriver): Selenium WebDriver used for the search.
+        output_folder (str): Path of the folder to save the downloaded images.
+    """
+
     try:
         driver.get('https://www.bing.com/visualsearch')
         upload_button = WebDriverWait(driver, WAIT_TIME).until(
@@ -87,7 +125,13 @@ def search_and_download_similar_images(image_path, driver, output_folder):
         logging.error(f"Error during image search and download: {e}")
 
 def process_image_categories(base_dir):
-    """Process each category and image in the base directory."""
+    """
+    Process each image in each category within a base directory using a headless browser to search and download similar images.
+
+    Args:
+        base_dir (str): Base directory containing image categories for processing.
+    """
+
     options = Options()
     options.headless = True
     driver = webdriver.Edge()
