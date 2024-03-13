@@ -82,7 +82,6 @@ def scroll_to_load_images(driver):
     Args:
         driver (webdriver): Selenium WebDriver used for automated webpage navigation.
     """
-    # Function body...
 
     last_height = driver.execute_script("return document.body.scrollHeight")
     while True:
